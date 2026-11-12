@@ -74,7 +74,7 @@ nav a:hover { color: var(--text); }
 
 /* Kezdőoldal */
 .hero {
-  min-height: 500px;
+  min-height: 100px;
   display: flex;
   flex-direction: column;
   justify-content: center;

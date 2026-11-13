@@ -1,0 +1,308 @@
+<!doctype html>
+<html lang="hu">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Három középiskolai algoritmus bemutatása CSES-feladatok alapján.">
+  <title>Algoritmikus gondolkodás a gyakorlatban</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Libre+Baskerville:wght@400;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css?v=6">
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="#feladatok">Algoritmikus gondolkodás</a>
+    <nav aria-label="Fő navigáció">
+      <a href="#feladatok">Feladatok</a>
+      <a href="#osszegzes">Összegzés</a>
+    </nav>
+  </header>
+
+  <main>
+    <section id="feladatok" class="shell home">
+      <h1>Feladatok</h1>
+      <div class="card-grid">
+        <a class="task-card green" href="#oriaskerek">
+          <span>01 · Mohó algoritmus</span>
+          <h3>Párosítás az óriáskeréken</h3>
+          <p>Az utasokat úgy párosítjuk, hogy a lehető legkevesebb gondolára legyen szükség.</p>
+        </a>
+        <a class="task-card blue" href="#labirintus">
+          <span>02 · Szélességi keresés</span>
+          <h3>Menekülés a labirintusból</h3>
+          <p>Rétegenként haladva találjuk meg a legrövidebb utat.</p>
+        </a>
+        <a class="task-card orange" href="#almak">
+          <span>03 · Rekurzió</span>
+          <h3>Almák igazságos elosztása</h3>
+          <p>Minden almánál mindkét lehetséges döntést kipróbáljuk.</p>
+        </a>
+      </div>
+    </section>
+
+    <section id="oriaskerek" class="lesson shell green">
+      <div class="lesson-heading">
+        <div>
+          <p class="kicker">01 · Mohó algoritmus</p>
+          <h2>Párosítás az óriáskeréken</h2>
+        </div>
+        <a class="source" href="https://cses.fi/problemset/task/1090" target="_blank" rel="noreferrer">CSES: Ferris Wheel – 1090 ↗</a>
+      </div>
+
+      <div class="problem-box">
+        <h3>A feladat</h3>
+        <p>Egy gondolában legfeljebb két utas ülhet, és az össztömegük nem lehet több <strong>120 kg-nál</strong>. Az utasok tömege <strong>45, 55, 70 és 80 kg</strong>. Hány gondolára van legalább szükség?</p>
+      </div>
+
+      <div class="two-column">
+        <div class="visual-panel">
+          <h3>Lépések szemléltetése</h3>
+          <div id="greedyPeople" class="people" aria-live="polite"></div>
+          <div id="greedyResult" class="result-box">A tömegeket növekvő sorrendbe rendezzük.</div>
+          <div id="greedyBoats" class="chips"></div>
+          <div class="controls">
+            <button id="greedyNext" class="button" type="button">Következő lépés</button>
+            <button id="greedyReset" class="button secondary" type="button">Újrakezdés</button>
+          </div>
+        </div>
+        <div class="explanation">
+          <h3>Az algoritmus ötlete</h3>
+          <ol>
+            <li>Rendezzük az utasok tömegét.</li>
+            <li>Két mutatót használunk: a legkönnyebb és a legnehezebb utasra.</li>
+            <li>A legnehezebb utas mindenképpen elindul.</li>
+            <li>Ha a legkönnyebbel együtt befér, párban utaznak; különben a legnehezebb egyedül indul.</li>
+          </ol>
+          <div class="why"><strong>Miért jó a mohó döntés?</strong> Ha a legnehezebb utas mellé a legkönnyebb sem fér be, akkor más utas sem férne be mellé. Ha viszont befér, érdemes őket párosítani.</div>
+        </div>
+      </div>
+
+      <div class="python-runner">
+        <div class="runner-heading">
+          <h3>Szerkeszthető Python-kód</h3>
+          <button class="button run-python" type="button" data-editor="codeGreedy" data-output="outputGreedy">▶ Futtatás</button>
+        </div>
+        <textarea id="codeGreedy" class="code-editor" spellcheck="false">tomegek = [45, 55, 70, 80]
+hatar = 120
+
+tomegek.sort()
+bal = 0
+jobb = len(tomegek) - 1
+gondolak = 0
+
+while bal &lt;= jobb:
+    if tomegek[bal] + tomegek[jobb] &lt;= hatar:
+        bal += 1
+    jobb -= 1
+    gondolak += 1
+
+print("Szükséges gondolák száma:", gondolak)</textarea>
+        <div class="output-label">Kimenet</div>
+        <pre id="outputGreedy" class="code-output">A program még nem futott le.</pre>
+      </div>
+      <p class="complexity"><strong>Időigény:</strong> O(n log n), mert a rendezés a legköltségesebb lépés.</p>
+    </section>
+
+    <section id="labirintus" class="lesson shell blue">
+      <div class="lesson-heading">
+        <div>
+          <p class="kicker">02 · Szélességi keresés</p>
+          <h2>Menekülés a labirintusból</h2>
+        </div>
+        <a class="source" href="https://cses.fi/problemset/task/1193" target="_blank" rel="noreferrer">CSES: Labyrinth – 1193 ↗</a>
+      </div>
+
+      <div class="problem-box">
+        <h3>A feladat</h3>
+        <p>Az <strong>A</strong> mezőről el kell jutnunk a <strong>B</strong> mezőre. Fel, le, balra és jobbra léphetünk, de falon nem haladhatunk át. A legrövidebb utat keressük.</p>
+      </div>
+
+      <div class="two-column">
+        <div class="visual-panel">
+          <h3>Rétegenkénti bejárás</h3>
+          <div id="maze" class="maze" aria-label="Labirintus szemléltetése"></div>
+          <div id="bfsResult" class="result-box">A kezdőpont a 0. réteg.</div>
+          <div class="controls">
+            <button id="bfsNext" class="button" type="button">Következő réteg</button>
+            <button id="bfsReset" class="button secondary" type="button">Újrakezdés</button>
+          </div>
+        </div>
+        <div class="explanation">
+          <h3>Az algoritmus ötlete</h3>
+          <ol>
+            <li>A kezdőmezőt betesszük egy FIFO sorba.</li>
+            <li>Kivesszük a sor első elemét, és megnézzük a szomszédait.</li>
+            <li>Az új, járható mezőket megjelöljük és a sor végére tesszük.</li>
+            <li>Először az 1, majd a 2, aztán a 3 lépésre lévő mezőket érjük el.</li>
+          </ol>
+          <div class="why"><strong>Miért lesz ez a legrövidebb út?</strong> A BFS növekvő távolság szerint halad. Amikor először eléri a célmezőt, rövidebb út már nem létezhet.</div>
+        </div>
+      </div>
+
+      <div class="python-runner">
+        <div class="runner-heading">
+          <h3>Szerkeszthető Python-kód</h3>
+          <button class="button run-python" type="button" data-editor="codeBfs" data-output="outputBfs">▶ Futtatás</button>
+        </div>
+        <textarea id="codeBfs" class="code-editor" spellcheck="false">from collections import deque
+
+palya = [
+    "#######",
+    "#A#...#",
+    "#.#.#B#",
+    "#.....#",
+    "#######"
+]
+
+kezdo = (1, 1)
+sor = deque([kezdo])
+latogatott = {kezdo}
+szulo = {}
+lepes = {}
+iranyok = [(-1, 0, "U"), (1, 0, "D"),
+           (0, -1, "L"), (0, 1, "R")]
+cel = None
+
+while sor:
+    sor_index, oszlop = sor.popleft()
+
+    if palya[sor_index][oszlop] == "B":
+        cel = (sor_index, oszlop)
+        break
+
+    for ds, do, betu in iranyok:
+        uj = (sor_index + ds, oszlop + do)
+        if palya[uj[0]][uj[1]] != "#" and uj not in latogatott:
+            latogatott.add(uj)
+            szulo[uj] = (sor_index, oszlop)
+            lepes[uj] = betu
+            sor.append(uj)
+
+if cel is not None:
+    utvonal = []
+    aktualis = cel
+
+    while aktualis != kezdo:
+        utvonal.append(lepes[aktualis])
+        aktualis = szulo[aktualis]
+
+    utvonal.reverse()
+    print("A legrövidebb út hossza:", len(utvonal))
+    print("Az útvonal:", "".join(utvonal))
+else:
+    print("Nincs út a kijárathoz.")</textarea>
+        <div class="output-label">Kimenet</div>
+        <pre id="outputBfs" class="code-output">A program még nem futott le.</pre>
+      </div>
+      <p class="complexity"><strong>Időigény:</strong> O(n · m), mert minden mezőt legfeljebb egyszer dolgozunk fel.</p>
+    </section>
+
+    <section id="almak" class="lesson shell orange">
+      <div class="lesson-heading">
+        <div>
+          <p class="kicker">03 · Rekurzív teljes keresés</p>
+          <h2>Almák igazságos elosztása</h2>
+        </div>
+        <a class="source" href="https://cses.fi/problemset/task/1623" target="_blank" rel="noreferrer">CSES: Apple Division – 1623 ↗</a>
+      </div>
+
+      <div class="problem-box">
+        <h3>A feladat</h3>
+        <p>Az almák tömege <strong>3, 2, 7, 4 és 1 kg</strong>. Két csoportba kell osztanunk őket úgy, hogy a két csoport össztömege közötti különbség a lehető legkisebb legyen.</p>
+      </div>
+
+      <div class="two-column">
+        <div class="visual-panel">
+          <h3>A döntési fa első szintjei</h3>
+          <div class="tree" aria-label="A 3 és 2 kilogrammos alma lehetséges elhelyezése a két kosárban">
+            <div class="tree-start">
+              <span>Kezdőállapot</span>
+              <strong>A = 0 kg · B = 0 kg</strong>
+            </div>
+            <p class="tree-step">1. alma: 3 kg</p>
+            <div class="tree-branches">
+              <div class="branch-group">
+                <div class="tree-state parent-state">
+                  <span>3 kg → A kosár</span>
+                  <strong>A = 3 · B = 0</strong>
+                </div>
+                <p class="tree-step small-step">2. alma: 2 kg</p>
+                <div class="child-states">
+                  <div class="tree-state"><span>2 kg → A</span><strong>A = 5 · B = 0</strong></div>
+                  <div class="tree-state"><span>2 kg → B</span><strong>A = 3 · B = 2</strong></div>
+                </div>
+              </div>
+              <div class="branch-group">
+                <div class="tree-state parent-state">
+                  <span>3 kg → B kosár</span>
+                  <strong>A = 0 · B = 3</strong>
+                </div>
+                <p class="tree-step small-step">2. alma: 2 kg</p>
+                <div class="child-states">
+                  <div class="tree-state"><span>2 kg → A</span><strong>A = 2 · B = 3</strong></div>
+                  <div class="tree-state"><span>2 kg → B</span><strong>A = 0 · B = 5</strong></div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="result-box">Minden szinten a következő almáról döntünk. Az ág végén az A és B kosár aktuális össztömege látható.</div>
+        </div>
+        <div class="explanation">
+          <h3>Az algoritmus ötlete</h3>
+          <ol>
+            <li>Az állapot megadja a következő alma indexét és a két kosár összegét.</li>
+            <li>Az egyik hívás az A, a másik a B kosárba teszi az almát.</li>
+            <li>Az alapesetben minden almát elhelyeztünk.</li>
+            <li>A két ág eredménye közül a kisebb különbséget tartjuk meg.</li>
+          </ol>
+          <div class="why"><strong>Miért biztos az optimum?</strong> Az algoritmus minden lehetséges elosztást megvizsgál, ezért a legjobb megoldás nem maradhat ki.</div>
+        </div>
+      </div>
+
+      <div class="python-runner">
+        <div class="runner-heading">
+          <h3>Szerkeszthető Python-kód</h3>
+          <button class="button run-python" type="button" data-editor="codeApples" data-output="outputApples">▶ Futtatás</button>
+        </div>
+        <textarea id="codeApples" class="code-editor" spellcheck="false">almak = [3, 2, 7, 4, 1]
+
+def keres(index, osszeg_a, osszeg_b):
+    if index == len(almak):
+        return abs(osszeg_a - osszeg_b)
+
+    alma = almak[index]
+    ag_a = keres(index + 1, osszeg_a + alma, osszeg_b)
+    ag_b = keres(index + 1, osszeg_a, osszeg_b + alma)
+    return min(ag_a, ag_b)
+
+eredmeny = keres(0, 0, 0)
+print("A legkisebb különbség:", eredmeny, "kg")</textarea>
+        <div class="output-label">Kimenet</div>
+        <pre id="outputApples" class="code-output">A program még nem futott le.</pre>
+      </div>
+      <p class="complexity"><strong>Időigény:</strong> O(2<sup>n</sup>). Az eredeti CSES-feladatban n legfeljebb 20, ezért ez még kezelhető.</p>
+    </section>
+
+    <section id="osszegzes" class="summary shell">
+      <p class="kicker">Összegzés</p>
+      <h2>Az algoritmus a feladat szerkezetétől függ</h2>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Feladat</th><th>Módszer</th><th>Fő adatszerkezet</th><th>Időigény</th></tr></thead>
+          <tbody>
+            <tr><td>Óriáskerék</td><td>Mohó döntés</td><td>Rendezett lista, két mutató</td><td>O(n log n)</td></tr>
+            <tr><td>Labirintus</td><td>Szélességi keresés</td><td>FIFO sor</td><td>O(n · m)</td></tr>
+            <tr><td>Almák</td><td>Teljes keresés</td><td>Rekurzív hívási verem</td><td>O(2<sup>n</sup>)</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="closing">A programozásban nem a kódolás az első lépés. Először megértjük a problémát, felismerjük a megfelelő módszert, és csak ezután írjuk meg a programot.</p>
+    </section>
+  </main>
+
+  <footer>Algoritmizálás és problémamegoldás tanítása · CSES-feladatok alapján</footer>
+  <script src="https://cdn.jsdelivr.net/pyodide/v314.0.7/full/pyodide.js"></script>
+  <script src="script.js?v=6"></script>
+</body>
+</html>
